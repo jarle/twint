@@ -41,10 +41,6 @@ class Twint:
             logme.debug(__name__ + ':Twint:__init__:clean_follow_list')
             output._clean_follow_list()
 
-        if self.config.Pandas_clean:
-            logme.debug(__name__ + ':Twint:__init__:pandas_clean')
-            storage.panda.clean()
-
     def get_resume(self, resumeFile):
         if not os.path.exists(resumeFile):
             return '-1'
@@ -346,8 +342,6 @@ def Favorites(config):
     config.Profile = False
     config.TwitterSearch = False
     run(config)
-    if config.Pandas_au:
-        storage.panda._autoget("tweet")
 
 
 def Followers(config):
@@ -358,13 +352,6 @@ def Followers(config):
     config.Favorites = False
     config.TwitterSearch = False
     run(config)
-    if config.Pandas_au:
-        storage.panda._autoget("followers")
-        if config.User_full:
-            storage.panda._autoget("user")
-    if config.Pandas_clean and not config.Store_object:
-        # storage.panda.clean()
-        output._clean_follow_list()
 
 
 def Following(config):
@@ -375,13 +362,6 @@ def Following(config):
     config.Favorites = False
     config.TwitterSearch = False
     run(config)
-    if config.Pandas_au:
-        storage.panda._autoget("following")
-        if config.User_full:
-            storage.panda._autoget("user")
-    if config.Pandas_clean and not config.Store_object:
-        # storage.panda.clean()
-        output._clean_follow_list()
 
 
 def Lookup(config):
@@ -393,8 +373,6 @@ def Lookup(config):
     config.Followers = False
     config.TwitterSearch = False
     run(config)
-    if config.Pandas_au:
-        storage.panda._autoget("user")
 
 
 def Profile(config):
@@ -405,8 +383,6 @@ def Profile(config):
     config.Followers = False
     config.TwitterSearch = False
     run(config)
-    if config.Pandas_au:
-        storage.panda._autoget("tweet")
 
 
 def Search(config, callback=None):
@@ -417,5 +393,3 @@ def Search(config, callback=None):
     config.Followers = False
     config.Profile = False
     run(config, callback)
-    if config.Pandas_au:
-        storage.panda._autoget("tweet")

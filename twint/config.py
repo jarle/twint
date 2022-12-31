@@ -43,17 +43,13 @@ class Config:
     Store_object_tweets_list: list = None
     Store_object_users_list: list = None
     Store_object_follow_list: list = None
-    Pandas_type: type = None
-    Pandas: bool = False
     Retries_count: int = 10
     Resume: object = None
     Images: bool = False
     Videos: bool = False
     Media: bool = False
     Replies: bool = False
-    Pandas_clean: bool = True
     Lowercase: bool = True
-    Pandas_au: bool = True
     Proxy_port: int = 0
     Proxy_type: object = None
     Tor_control_port: int = 9051

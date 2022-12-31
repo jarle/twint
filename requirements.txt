@@ -2,7 +2,6 @@ aiohttp
 beautifulsoup4
 dataclasses
 pysocks
-pandas
 geopy
 fake-useragent
 requests
