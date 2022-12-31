@@ -16,6 +16,7 @@ VERSION = None
 # Packages required
 REQUIRED = [
     'aiohttp', 'dataclasses',
+    'beautifulsoup4',
     'elasticsearch', 'pandas',
     'schedule', 'geopy', 'fake-useragent'
 ]
