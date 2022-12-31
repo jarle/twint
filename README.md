@@ -163,30 +163,6 @@ Twitter can shadow-ban accounts, which means that their tweets will not be avail
 `twint --userlist inputlist --user-full`
 
 
-#### tweet translation (experimental)
-
-> To get 100 english tweets and translate them to italian
-
-`twint -u noneprivacy --csv --output none.csv --lang en --translate --translate-dest it --limit 100`
-
-or
-
-```python
-import twint
-
-c = twint.Config()
-c.Username = "noneprivacy"
-c.Limit = 100
-c.Store_csv = True
-c.Output = "none.csv"
-c.Lang = "en"
-c.Translate = True
-c.TranslateDest = "it"
-twint.run.Search(c)
-```
-
-Notes:
-- [Google translate has some quotas](https://cloud.google.com/translate/quotas)
 
 ## Featured Blog Posts:
 - [How to use Twint as an OSINT tool](https://pielco11.ovh/posts/twint-osint/)

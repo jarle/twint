@@ -1,21 +1,22 @@
+import hashlib
 import sqlite3
 import sys
 import time
-import hashlib
-
 from datetime import datetime
+
 
 def Conn(database):
     if database:
         print("[+] Inserting into Database: " + str(database))
         conn = init(database)
-        if isinstance(conn, str): # error
+        if isinstance(conn, str):  # error
             print(conn)
             sys.exit(1)
     else:
         conn = ""
 
     return conn
+
 
 def init(db):
     try:
@@ -83,9 +84,6 @@ def init(db):
                     near text,
                     source text,
                     time_update integer not null,
-                    `translate` text default '',
-                    trans_src text default '',
-                    trans_dest text default '',
                     PRIMARY KEY (id)
                 );
         """
@@ -118,7 +116,7 @@ def init(db):
         """
         cursor.execute(table_reply_to)
 
-        table_favorites =  """
+        table_favorites = """
             CREATE TABLE IF NOT EXISTS
                 favorites(
                     user_id integer not null,
@@ -180,6 +178,7 @@ def init(db):
     except Exception as e:
         return str(e)
 
+
 def fTable(Followers):
     if Followers:
         table = "followers_names"
@@ -188,6 +187,7 @@ def fTable(Followers):
 
     return table
 
+
 def uTable(Followers):
     if Followers:
         table = "followers"
@@ -195,6 +195,7 @@ def uTable(Followers):
         table = "following"
 
     return table
+
 
 def follow(conn, Username, Followers, User):
     try:
@@ -208,20 +209,24 @@ def follow(conn, Username, Followers, User):
     except sqlite3.IntegrityError:
         pass
 
+
 def get_hash_id(conn, id):
     cursor = conn.cursor()
     cursor.execute('SELECT hex_dig FROM users WHERE id = ? LIMIT 1', (id,))
     resultset = cursor.fetchall()
     return resultset[0][0] if resultset else -1
 
+
 def user(conn, config, User):
     try:
         time_ms = round(time.time()*1000)
         cursor = conn.cursor()
-        user = [int(User.id), User.id, User.name, User.username, User.bio, User.location, User.url,User.join_date, User.join_time, User.tweets, User.following, User.followers, User.likes, User.media_count, User.is_private, User.is_verified, User.avatar, User.background_image]
+        user = [int(User.id), User.id, User.name, User.username, User.bio, User.location, User.url, User.join_date, User.join_time, User.tweets,
+                User.following, User.followers, User.likes, User.media_count, User.is_private, User.is_verified, User.avatar, User.background_image]
 
-        hex_dig = hashlib.sha256(','.join(str(v) for v in user).encode()).hexdigest()
-        entry = tuple(user) + (hex_dig,time_ms,)
+        hex_dig = hashlib.sha256(','.join(str(v)
+                                 for v in user).encode()).hexdigest()
+        entry = tuple(user) + (hex_dig, time_ms,)
         old_hash = get_hash_id(conn, User.id)
 
         if old_hash == -1 or old_hash != hex_dig:
@@ -239,44 +244,43 @@ def user(conn, config, User):
     except sqlite3.IntegrityError:
         pass
 
+
 def tweets(conn, Tweet, config):
     try:
         time_ms = round(time.time()*1000)
         cursor = conn.cursor()
         entry = (Tweet.id,
-                    Tweet.id_str,
-                    Tweet.tweet,
-                    Tweet.lang,
-                    Tweet.conversation_id,
-                    Tweet.datetime,
-                    Tweet.datestamp,
-                    Tweet.timestamp,
-                    Tweet.timezone,
-                    Tweet.place,
-                    Tweet.replies_count,
-                    Tweet.likes_count,
-                    Tweet.retweets_count,
-                    Tweet.user_id,
-                    Tweet.user_id_str,
-                    Tweet.username,
-                    Tweet.name,
-                    Tweet.link,
-                    ",".join(Tweet.mentions),
-                    ",".join(Tweet.hashtags),
-                    ",".join(Tweet.cashtags),
-                    ",".join(Tweet.urls),
-                    ",".join(Tweet.photos),
-                    Tweet.thumbnail,
-                    Tweet.quote_url,
-                    Tweet.video,
-                    Tweet.geo,
-                    Tweet.near,
-                    Tweet.source,
-                    time_ms,
-                    Tweet.translate,
-                    Tweet.trans_src,
-                    Tweet.trans_dest)
-        cursor.execute('INSERT INTO tweets VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', entry)
+                 Tweet.id_str,
+                 Tweet.tweet,
+                 Tweet.lang,
+                 Tweet.conversation_id,
+                 Tweet.datetime,
+                 Tweet.datestamp,
+                 Tweet.timestamp,
+                 Tweet.timezone,
+                 Tweet.place,
+                 Tweet.replies_count,
+                 Tweet.likes_count,
+                 Tweet.retweets_count,
+                 Tweet.user_id,
+                 Tweet.user_id_str,
+                 Tweet.username,
+                 Tweet.name,
+                 Tweet.link,
+                 ",".join(Tweet.mentions),
+                 ",".join(Tweet.hashtags),
+                 ",".join(Tweet.cashtags),
+                 ",".join(Tweet.urls),
+                 ",".join(Tweet.photos),
+                 Tweet.thumbnail,
+                 Tweet.quote_url,
+                 Tweet.video,
+                 Tweet.geo,
+                 Tweet.near,
+                 Tweet.source,
+                 time_ms)
+        cursor.execute(
+            'INSERT INTO tweets VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', entry)
 
         if config.Favorites:
             query = 'INSERT INTO favorites VALUES(?,?)'
@@ -284,13 +288,16 @@ def tweets(conn, Tweet, config):
 
         if Tweet.retweet:
             query = 'INSERT INTO retweets VALUES(?,?,?,?,?)'
-            _d = datetime.timestamp(datetime.strptime(Tweet.retweet_date, "%Y-%m-%d %H:%M:%S"))
-            cursor.execute(query, (int(Tweet.user_rt_id), Tweet.user_rt, Tweet.id, int(Tweet.retweet_id), _d))
+            _d = datetime.timestamp(datetime.strptime(
+                Tweet.retweet_date, "%Y-%m-%d %H:%M:%S"))
+            cursor.execute(query, (int(Tweet.user_rt_id),
+                           Tweet.user_rt, Tweet.id, int(Tweet.retweet_id), _d))
 
         if Tweet.reply_to:
             for reply in Tweet.reply_to:
                 query = 'INSERT INTO replies VALUES(?,?,?)'
-                cursor.execute(query, (Tweet.id, int(reply['user_id']), reply['username']))
+                cursor.execute(query, (Tweet.id, int(
+                    reply['user_id']), reply['username']))
 
         conn.commit()
     except sqlite3.IntegrityError:

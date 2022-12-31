@@ -125,8 +125,6 @@ def initialize(args):
     c.Source = args.source
     c.Members_list = args.members_list
     c.Filter_retweets = args.filter_retweets
-    c.Translate = args.translate
-    c.TranslateDest = args.translate_dest
     c.Backoff_exponent = args.backoff_exponent
     c.Min_wait_time = args.min_wait_time
     return c
@@ -206,11 +204,6 @@ def options():
         help="Collects every tweet from a User's Timeline. (Tweets, RTs & Replies)",
         action="store_true",
     )
-    ap.add_argument("--translate",
-                    help="Get tweets translated by Google Translate.",
-                    action="store_true")
-    ap.add_argument("--translate-dest", help="Translate tweet to language (ISO2).",
-                    default="en")
     ap.add_argument("--debug",
                     help="Store information in debug logs", action="store_true")
     ap.add_argument("--resume", help="Resume from Tweet ID.",

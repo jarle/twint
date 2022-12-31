@@ -48,9 +48,6 @@ setup(
         ],
     },
     install_requires=REQUIRED,
-    dependency_links=[
-        'git+https://github.com/x0rzkov/py-googletrans#egg=googletrans'
-    ],
     license='MIT',
     classifiers=[
         'License :: OSI Approved :: MIT License',
