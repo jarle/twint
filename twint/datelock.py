@@ -1,5 +1,4 @@
 import datetime
-
 import logging as logme
 
 from .tweet import utc_to_local

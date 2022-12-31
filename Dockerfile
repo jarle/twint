@@ -1,8 +1,13 @@
 FROM python:3-slim
 
-WORKDIR /root
+WORKDIR /app
+
+RUN pip3 install pipenv
+
+COPY Pipfile.lock .
+RUN pipenv install
 
 COPY . .
-RUN pip3 install . -r requirements.txt
+RUN pipenv install .
 
-CMD /bin/bash
+CMD pipenv shell

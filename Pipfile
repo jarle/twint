@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+aiohttp = "*"
+beautifulsoup4 = "*"
+dataclasses = "*"
+fake-useragent = "*"
+requests = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
