@@ -18,7 +18,7 @@ REQUIRED = [
     'aiohttp', 'dataclasses',
     'beautifulsoup4',
     'elasticsearch', 'pandas',
-    'schedule', 'geopy', 'fake-useragent'
+    'geopy', 'fake-useragent'
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))

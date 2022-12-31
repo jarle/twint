@@ -4,7 +4,6 @@ dataclasses
 elasticsearch
 pysocks
 pandas
-schedule
 geopy
 fake-useragent
 requests
