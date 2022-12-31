@@ -23,20 +23,7 @@ Some of the benefits of using Twint vs Twitter API:
 Twitter limits scrolls while browsing the user timeline. This means that with `.Profile` or with `.Favorites` you will be able to get ~3200 tweets.
 
 ## Requirements
-- Python 3.6;
-- aiohttp;
-- aiodns;
-- beautifulsoup4;
-- cchardet;
-- dataclasses
-- elasticsearch;
-- pysocks;
-- pandas (>=0.23.0);
-- aiohttp_socks;
-- schedule;
-- geopy;
-- fake-useragent;
-- py-googletransx.
+See [requirements.txt](./requirements.txt)
 
 ## Installing
 

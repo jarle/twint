@@ -1,7 +1,8 @@
 #!/usr/bin/python3
-from setuptools import setup
 import io
 import os
+
+from setuptools import setup
 
 # Package meta-data
 NAME = 'twint'
@@ -14,9 +15,9 @@ VERSION = None
 
 # Packages required
 REQUIRED = [
-    'aiohttp', 'aiodns', 'beautifulsoup4', 'cchardet', 'dataclasses',
-    'elasticsearch', 'pysocks', 'pandas', 'aiohttp_socks',
-    'schedule', 'geopy', 'fake-useragent', 'googletransx'
+    'aiohttp', 'dataclasses',
+    'elasticsearch', 'pandas',
+    'schedule', 'geopy', 'fake-useragent'
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))

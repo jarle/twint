@@ -1,15 +1,15 @@
-import sys, os, datetime
-from asyncio import get_event_loop, TimeoutError, ensure_future, new_event_loop, set_event_loop
-
-from . import datelock, feed, get, output, verbose, storage
-from .token import TokenExpiryException
-from . import token
-from .storage import db
-from .feed import NoMoreTweetsException
-
+import datetime
 import logging as logme
-
+import os
+import sys
 import time
+from asyncio import (TimeoutError, ensure_future, get_event_loop,
+                     new_event_loop, set_event_loop)
+
+from . import datelock, feed, get, output, storage, token, verbose
+from .feed import NoMoreTweetsException
+from .storage import db
+from .token import TokenExpiryException
 
 bearer = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs' \
          '%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA'
@@ -66,7 +66,8 @@ class Twint:
                 response = await get.RequestUrl(self.config, self.init)
 
             if self.config.Debug:
-                print(response, file=open("twint-last-request.log", "w", encoding="utf-8"))
+                print(response, file=open(
+                    "twint-last-request.log", "w", encoding="utf-8"))
 
             self.feed = []
             try:
@@ -91,33 +92,23 @@ class Twint:
                         time.sleep(5)
                 elif self.config.Profile or self.config.TwitterSearch:
                     try:
-                        self.feed, self.init = feed.parse_tweets(self.config, response)
+                        self.feed, self.init = feed.parse_tweets(
+                            self.config, response)
                     except NoMoreTweetsException as e:
                         logme.debug(__name__ + ':Twint:Feed:' + str(e))
                         print('[!] ' + str(e) + ' Scraping will stop now.')
-                        print('found {} deleted tweets in this search.'.format(len(self.config.deleted)))
+                        print('found {} deleted tweets in this search.'.format(
+                            len(self.config.deleted)))
                         break
                 break
             except TimeoutError as e:
-                if self.config.Proxy_host.lower() == "tor":
-                    print("[?] Timed out, changing Tor identity...")
-                    if self.config.Tor_control_password is None:
-                        logme.critical(__name__ + ':Twint:Feed:tor-password')
-                        sys.stderr.write("Error: config.Tor_control_password must be set for proxy auto-rotation!\r\n")
-                        sys.stderr.write(
-                            "Info: What is it? See https://stem.torproject.org/faq.html#can-i-interact-with-tors"
-                            "-controller-interface-directly\r\n")
-                        break
-                    else:
-                        get.ForceNewTorIdentity(self.config)
-                        continue
-                else:
-                    logme.critical(__name__ + ':Twint:Feed:' + str(e))
-                    print(str(e))
-                    break
+                logme.critical(__name__ + ':Twint:Feed:' + str(e))
+                print(str(e))
+                break
             except Exception as e:
                 if self.config.Profile or self.config.Favorites:
-                    print("[!] Twitter does not return more data, scrape stops here.")
+                    print(
+                        "[!] Twitter does not return more data, scrape stops here.")
                     break
 
                 logme.critical(__name__ + ':Twint:Feed:noData' + str(e))
@@ -126,7 +117,8 @@ class Twint:
                 consecutive_errors_count += 1
                 if consecutive_errors_count < self.config.Retries_count:
                     # skip to the next iteration if wait time does not satisfy limit constraints
-                    delay = round(consecutive_errors_count ** self.config.Backoff_exponent, 1)
+                    delay = round(consecutive_errors_count **
+                                  self.config.Backoff_exponent, 1)
 
                     # if the delay is less than users set min wait time then replace delay
                     if self.config.Min_wait_time > delay:
@@ -136,7 +128,8 @@ class Twint:
                     time.sleep(delay)
                     self.user_agent = await get.RandomUserAgent(wa=True)
                     continue
-                logme.critical(__name__ + ':Twint:Feed:Tweets_known_error:' + str(e))
+                logme.critical(
+                    __name__ + ':Twint:Feed:Tweets_known_error:' + str(e))
                 sys.stderr.write(str(e) + " [x] run.Feed")
                 sys.stderr.write(
                     "[!] if you get this error but you know for sure that more tweets exist, please open an issue and "
@@ -165,40 +158,51 @@ class Twint:
             tweet_dict = {}
             self.count += 1
             try:
-                tweet_dict['data-item-id'] = tweet.find("div", {"class": "tweet-text"})['data-id']
-                t_url = tweet.find("span", {"class": "metadata"}).find("a")["href"]
-                tweet_dict['data-conversation-id'] = t_url.split('?')[0].split('/')[-1]
+                tweet_dict['data-item-id'] = tweet.find(
+                    "div", {"class": "tweet-text"})['data-id']
+                t_url = tweet.find(
+                    "span", {"class": "metadata"}).find("a")["href"]
+                tweet_dict['data-conversation-id'] = t_url.split('?')[
+                    0].split('/')[-1]
                 tweet_dict['username'] = tweet.find("div", {"class": "username"}).text.replace('\n', '').replace(' ',
                                                                                                                  '')
-                tweet_dict['tweet'] = tweet.find("div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"}).text
-                date_str = tweet.find("td", {"class": "timestamp"}).find("a").text
+                tweet_dict['tweet'] = tweet.find(
+                    "div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"}).text
+                date_str = tweet.find(
+                    "td", {"class": "timestamp"}).find("a").text
                 # test_dates = ["1m", "2h", "Jun 21, 2019", "Mar 12", "28 Jun 19"]
                 # date_str = test_dates[3]
-                if len(date_str) <= 3 and (date_str[-1] == "m" or date_str[-1] == "h"):  # 25m 1h
+                # 25m 1h
+                if len(date_str) <= 3 and (date_str[-1] == "m" or date_str[-1] == "h"):
                     dateu = str(datetime.date.today())
                     tweet_dict['date'] = dateu
                 elif ',' in date_str:  # Aug 21, 2019
                     sp = date_str.replace(',', '').split(' ')
                     date_str_formatted = sp[1] + ' ' + sp[0] + ' ' + sp[2]
-                    dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                    dateu = datetime.datetime.strptime(
+                        date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
                     tweet_dict['date'] = dateu
                 elif len(date_str.split(' ')) == 3:  # 28 Jun 19
                     sp = date_str.split(' ')
                     if len(sp[2]) == 2:
                         sp[2] = '20' + sp[2]
                     date_str_formatted = sp[0] + ' ' + sp[1] + ' ' + sp[2]
-                    dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                    dateu = datetime.datetime.strptime(
+                        date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
                     tweet_dict['date'] = dateu
                 else:  # Aug 21
                     sp = date_str.split(' ')
-                    date_str_formatted = sp[1] + ' ' + sp[0] + ' ' + str(datetime.date.today().year)
-                    dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                    date_str_formatted = sp[1] + ' ' + sp[0] + \
+                        ' ' + str(datetime.date.today().year)
+                    dateu = datetime.datetime.strptime(
+                        date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
                     tweet_dict['date'] = dateu
 
                 favorited_tweets_list.append(tweet_dict)
 
             except Exception as e:
-                logme.critical(__name__ + ':Twint:favorite:favorite_field_lack')
+                logme.critical(
+                    __name__ + ':Twint:favorite:favorite_field_lack')
                 print("shit: ", date_str, " ", str(e))
 
         try:
@@ -227,7 +231,8 @@ class Twint:
 
     async def main(self, callback=None):
 
-        task = ensure_future(self.run())  # Might be changed to create_task in 3.7+.
+        # Might be changed to create_task in 3.7+.
+        task = ensure_future(self.run())
 
         if callback:
             task.add_done_callback(callback)
@@ -250,14 +255,17 @@ class Twint:
 
             self.config.User_id = await get.User(self.config.Username, self.config, self.conn, True)
             if self.config.User_id is None:
-                raise ValueError("Cannot find twitter account with name = " + self.config.Username)
+                raise ValueError(
+                    "Cannot find twitter account with name = " + self.config.Username)
 
         # TODO : will need to modify it to work with the new endpoints
         if self.config.TwitterSearch and self.config.Since and self.config.Until:
             logme.debug(__name__ + ':Twint:main:search+since+until')
             while self.d.since < self.d.until:
-                self.config.Since = datetime.datetime.strftime(self.d.since, "%Y-%m-%d %H:%M:%S")
-                self.config.Until = datetime.datetime.strftime(self.d.until, "%Y-%m-%d %H:%M:%S")
+                self.config.Since = datetime.datetime.strftime(
+                    self.d.since, "%Y-%m-%d %H:%M:%S")
+                self.config.Until = datetime.datetime.strftime(
+                    self.d.until, "%Y-%m-%d %H:%M:%S")
                 if len(self.feed) > 0:
                     await self.tweets()
                 else:
@@ -307,7 +315,8 @@ class Twint:
             await get.User(self.config.Username, self.config, db.Conn(self.config.Database))
 
         except Exception as e:
-            logme.exception(__name__ + ':Twint:Lookup:Unexpected exception occurred.')
+            logme.exception(
+                __name__ + ':Twint:Lookup:Unexpected exception occurred.')
             raise
 
 
@@ -319,7 +328,8 @@ def run(config, callback=None):
         if "no current event loop" in str(e):
             set_event_loop(new_event_loop())
         else:
-            logme.exception(__name__ + ':run:Unexpected exception while handling an expected RuntimeError.')
+            logme.exception(
+                __name__ + ':run:Unexpected exception while handling an expected RuntimeError.')
             raise
     except Exception as e:
         logme.exception(
