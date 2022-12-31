@@ -17,8 +17,6 @@ from . import url
 from .output import Tweets, Users
 from .token import TokenExpiryException
 
-httpproxy = None
-
 user_agent_list = [
     # 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
     # ' Chrome/60.0.3112.113 Safari/537.36',
@@ -100,27 +98,6 @@ async def RequestUrl(config, init):
     return response
 
 
-def ForceNewTorIdentity(config):
-    logme.debug(__name__ + ':ForceNewTorIdentity')
-    try:
-        tor_c = socket.create_connection(
-            ('127.0.0.1', config.Tor_control_port))
-        tor_c.send('AUTHENTICATE "{}"\r\nSIGNAL NEWNYM\r\n'.format(
-            config.Tor_control_password).encode())
-        response = tor_c.recv(1024)
-        if response != b'250 OK\r\n250 OK\r\n':
-            sys.stderr.write(
-                'Unexpected response from Tor control port: {}\n'.format(response))
-            logme.critical(
-                __name__ + ':ForceNewTorIdentity:unexpectedResponse')
-    except Exception as e:
-        logme.debug(__name__ + ':ForceNewTorIdentity:errorConnectingTor')
-        sys.stderr.write(
-            'Error connecting to Tor control port: {}\n'.format(repr(e)))
-        sys.stderr.write(
-            'If you want to rotate Tor ports automatically - enable Tor control port\n')
-
-
 async def Request(_url, connector=None, params=None, headers=None):
     logme.debug(__name__ + ':Request:Connector')
     async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
@@ -130,7 +107,7 @@ async def Request(_url, connector=None, params=None, headers=None):
 async def Response(session, _url, params=None):
     logme.debug(__name__ + ':Response')
     with timeout(120):
-        async with session.get(_url, ssl=True, params=params, proxy=httpproxy) as response:
+        async with session.get(_url, ssl=True, params=params) as response:
             resp = await response.text()
             if response.status == 429:  # 429 implies Too many requests i.e. Rate Limit Exceeded
                 raise TokenExpiryException(loads(resp)['errors'][0]['message'])

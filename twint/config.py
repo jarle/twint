@@ -50,10 +50,6 @@ class Config:
     Media: bool = False
     Replies: bool = False
     Lowercase: bool = True
-    Proxy_port: int = 0
-    Proxy_type: object = None
-    Tor_control_port: int = 9051
-    Tor_control_password: str = None
     Retweets: bool = False
     Query: str = None
     Hide_output: bool = False

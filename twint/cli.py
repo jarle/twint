@@ -112,8 +112,6 @@ def initialize(args):
     c.Videos = args.videos
     c.Media = args.media
     c.Replies = args.replies
-    c.Tor_control_port = args.tor_control_port
-    c.Tor_control_password = args.tor_control_password
     c.Retweets = args.retweets
     c.Custom_query = args.custom_query
     c.Popular_tweets = args.popular_tweets
@@ -189,14 +187,6 @@ def options():
         "--following", help="Scrape a person's follows", action="store_true")
     ap.add_argument(
         "--favorites", help="Scrape Tweets a user has liked.", action="store_true")
-    ap.add_argument("--proxy-type", help="Socks5, HTTP, etc.")
-    ap.add_argument("--proxy-host", help="Proxy hostname or IP.")
-    ap.add_argument("--proxy-port", help="The port of the proxy server.")
-    ap.add_argument("--tor-control-port",
-                    help="If proxy-host is set to tor, this is the control port", default=9051)
-    ap.add_argument("--tor-control-password",
-                    help="If proxy-host is set to tor, this is the password for the control port",
-                    default="my_password")
     ap.add_argument("--userlist", help="Userlist from list or file.")
     ap.add_argument("--retweets",
                     help="Include user's Retweets (Warning: limited).",
