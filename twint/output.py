@@ -1,11 +1,10 @@
+import logging as logme
 from datetime import datetime
 
 from . import format, get
+from .storage import db, panda, write
 from .tweet import Tweet
 from .user import User
-from .storage import db, elasticsearch, write, panda
-
-import logging as logme
 
 follows_list = []
 tweets_list = []
@@ -114,16 +113,12 @@ def _output(obj, output, config, **extra):
             write.Text(output, config.Output)
             logme.debug(__name__ + ':_output:Text')
 
-    if config.Elasticsearch:
-        logme.debug(__name__ + ':_output:Elasticsearch')
-        print("", end=".", flush=True)
-    else:
-        if not config.Hide_output:
-            try:
-                print(output.replace('\n', ' '))
-            except UnicodeEncodeError:
-                logme.critical(__name__ + ':_output:UnicodeEncodeError')
-                print("unicode error [x] output._output")
+    if not config.Hide_output:
+        try:
+            print(output.replace('\n', ' '))
+        except UnicodeEncodeError:
+            logme.critical(__name__ + ':_output:UnicodeEncodeError')
+            print("unicode error [x] output._output")
 
 
 async def checkData(tweet, config, conn):
@@ -147,9 +142,6 @@ async def checkData(tweet, config, conn):
                 config.Store_object_tweets_list.append(tweet)
             else:
                 tweets_list.append(tweet)
-        if config.Elasticsearch:
-            logme.debug(__name__ + ':checkData:Elasticsearch')
-            elasticsearch.Tweet(tweet, config)
         _output(tweet, output, config)
     # else:
     #     logme.critical(__name__+':checkData:copyrightedTweet')
@@ -181,16 +173,6 @@ async def Users(u, config, conn):
         logme.debug(__name__ + ':User:Database')
         db.user(conn, config, user)
 
-    if config.Elasticsearch:
-        logme.debug(__name__ + ':User:Elasticsearch')
-        _save_date = user.join_date
-        _save_time = user.join_time
-        user.join_date = str(datetime.strptime(user.join_date, "%d %b %Y")).split()[0]
-        user.join_time = str(datetime.strptime(user.join_time, "%I:%M %p")).split()[1]
-        elasticsearch.UserProfile(user, config)
-        user.join_date = _save_date
-        user.join_time = _save_time
-
     if config.Store_object:
         logme.debug(__name__ + ':User:Store_object')
 
@@ -217,10 +199,6 @@ async def Username(username, config, conn):
     if config.Database:
         logme.debug(__name__ + ':Username:Database')
         db.follow(conn, config.Username, config.Followers, username)
-
-    if config.Elasticsearch:
-        logme.debug(__name__ + ':Username:Elasticsearch')
-        elasticsearch.Follow(username, config)
 
     if config.Store_object:
         if hasattr(config.Store_object_follow_list, 'append'):

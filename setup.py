@@ -15,10 +15,7 @@ VERSION = None
 
 # Packages required
 REQUIRED = [
-    'aiohttp', 'dataclasses',
-    'beautifulsoup4',
-    'elasticsearch', 'pandas',
-    'geopy', 'fake-useragent'
+    'aiohttp', 'dataclasses', 'beautifulsoup4', 'pandas', 'geopy', 'fake-useragent'
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))

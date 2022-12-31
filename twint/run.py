@@ -36,7 +36,6 @@ class Twint:
         self.token.refresh()
         self.conn = db.Conn(config.Database)
         self.d = datelock.Set(self.config.Until, self.config.Since)
-        verbose.Elastic(config.Elasticsearch)
 
         if self.config.Store_object:
             logme.debug(__name__ + ':Twint:__init__:clean_follow_list')

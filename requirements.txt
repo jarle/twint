@@ -1,7 +1,6 @@
 aiohttp
 beautifulsoup4
 dataclasses
-elasticsearch
 pysocks
 pandas
 geopy
