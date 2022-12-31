@@ -1,6 +1,5 @@
 aiohttp
 beautifulsoup4
 dataclasses
-geopy
 fake-useragent
 requests
